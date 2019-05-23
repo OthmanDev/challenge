@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Frontend coding challenge</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
+    <link rel="stylesheet" href="app.css">
+  </head>
+  <body>
+      <div id="app">
+          <div class="container">
+              <div class="github-repositories">
+                  <div v-for="repository in repositories" class="repository">
+                    <div class="avatar">
+                        <img :src="repository.owner.avatar_url" :alt="repository.owner.login">
+                    </div>
+                    <div class="repo-info">
+                        <h3 class="repo-name">repository.name</h3>
+                        <p class="repo-desc">repository.description.substring(0, 45)</p>
+                        <ul class="flexed">
+                            <li>
+                                <span class="badge">Stars: repository.stargazers_count</span>
+                            </li>
+                            <li>
+                                <span class="badge">Issues: repository.open_issues_count</span>
+                            </li>
+                            <li>
+                                <span>Submitted 30 days ago by repository.owner.login</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+              </div>
+              <div v-if="loading" class="loading">
+                  <img src="loader.gif" alt="loader">
+              </div>
+              <div v-if="error" class="error">Verify your connection or there is no more results</div>
+          </div>
+      </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.2.0/vue-resource.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" charset="utf-8"></script>
+      
+  </body>
+</html>
