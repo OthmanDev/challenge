@@ -17,17 +17,17 @@
                         <img :src="repository.owner.avatar_url" :alt="repository.owner.login">
                     </div>
                     <div class="repo-info">
-                        <h3 class="repo-name">repository.name</h3>
-                        <p class="repo-desc">repository.description.substring(0, 45)</p>
+                        <h3 class="repo-name">{{ repository.name }}</h3>
+                        <p class="repo-desc">{{ repository.description.substring(0, 45) }}</p>
                         <ul class="flexed">
                             <li>
-                                <span class="badge">Stars: repository.stargazers_count</span>
+                                <span class="badge">Stars: {{ repository.stargazers_count }}</span>
                             </li>
                             <li>
-                                <span class="badge">Issues: repository.open_issues_count</span>
+                                <span class="badge">Issues: {{ repository.open_issues_count }}</span>
                             </li>
                             <li>
-                                <span>Submitted 30 days ago by repository.owner.login</span>
+                                <span>Submitted 30 days ago by {{ repository.owner.login }}</span>
                             </li>
                         </ul>
                     </div>
@@ -42,6 +42,69 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.2.0/vue-resource.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" charset="utf-8"></script>
-      
+      <script>
+        Vue.use(VueResource)
+        new Vue({
+            el: '#app',
+            data: {
+                repositories: [],
+                bottom: false,
+                page: 1,
+                date: moment().subtract(30, 'days').format(),
+                error: false,
+                loading: true
+            },
+            watch: {
+                bottom(bottom) {
+                    if (bottom) {
+                        this.page++;
+                        this.getRepositoriesSortedByStars();
+                    }
+                }
+            },
+            beforeMount() {
+                this.getRepositoriesSortedByStars();
+            },
+            mounted() {
+                window.addEventListener('scroll', this.eventScroll);
+            },
+            beforeDestroy() {
+                window.removeEventListener('scroll', this.eventScroll)
+            },
+            methods: {
+                getRepositoriesSortedByStars() {
+                    let API_BASE_URL = 'https://api.github.com/search/repositories';
+                    let API_QUERY    = `created:>${this.date}&sort=stars&order=desc&page=${this.page}`;
+                    let REQUEST_URL  = `${API_BASE_URL}?q=${API_QUERY}`;
+
+                    this.loading = true;
+                    this.error   = false;
+
+                    this.$http.get(REQUEST_URL).then((response) => {
+                       if (response.data.items.length > 0) {
+                         this.repositories = response.data.items;
+                         this.loading      = false;
+                       } else {
+                         this.loading = false;
+                         this.error   = true;
+                       }
+                    }, (response) => {
+                      this.loading = false;
+                      this.error   = true;
+                    });
+                },
+                eventScroll() {
+                    this.bottom = this.bottomVisible()
+                },
+                bottomVisible() {
+                    const scrollY       = window.scrollY
+                    const visible       = document.documentElement.clientHeight
+                    const pageHeight    = document.documentElement.scrollHeight
+                    const bottomOfPage  = visible + scrollY >= (pageHeight)
+                    return bottomOfPage || pageHeight < (visible)
+                }
+            },
+        });
+      </script>
   </body>
 </html>
